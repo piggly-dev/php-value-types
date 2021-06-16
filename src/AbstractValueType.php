@@ -80,7 +80,7 @@ abstract class AbstractValueType
 	 * @return boolean
 	 */
 	final public function isFilled () : bool
-	{ return \is_null($this->_value); }
+	{ return !\is_null($this->_value); }
 
 	/**
 	 * Get raw value of ValueType.
@@ -136,14 +136,6 @@ abstract class AbstractValueType
 	}
 
 	/**
-	 * Format value to expected data format.
-	 *
-	 * @since 1.0.0
-	 * @return void
-	 */
-	abstract protected function format ( $value );
-
-	/**
 	 * Assert if value meets the requirements
 	 * to ValueType. It must throw an
 	 * InvalidValueTypeOfException.
@@ -152,5 +144,9 @@ abstract class AbstractValueType
 	 * @return void
 	 * @throws InvalidValueTypeOfException
 	 */
-	abstract public function assert ();
+	public function assert ()
+	{
+		if ( \is_null($this->get()) && $this->isRequired() )
+		{ throw new InvalidValueTypeOfException($this, 'is required'); }
+	}
 }
