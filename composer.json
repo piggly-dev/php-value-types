@@ -16,7 +16,9 @@
         }
     },
     "require": {
-        "php": "^7.2 || ^8.0"
+        "php": "^7.2 || ^8.0",
+        "bjeavons/zxcvbn-php": "^1.2",
+        "respect/validation": "^2.2"
     },
     "require-dev": {
         "php": "^7.3 || ^8.0",
