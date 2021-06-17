@@ -1,7 +1,7 @@
 <?php
 namespace Piggly\ValueTypes\Advanced;
 
-use Piggly\ValueTypes\AbstractValueType;
+use Piggly\ValueTypes\AbstractMaskedType;
 use Respect\Validation\Validator as v;
 
 /**
@@ -17,7 +17,7 @@ use Respect\Validation\Validator as v;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class CnpjType extends AbstractValueType
+class CnpjType extends AbstractMaskedType
 {
 	/**
 	 * Constructor.
@@ -30,9 +30,10 @@ class CnpjType extends AbstractValueType
 	 */
 	public function __construct ( ?string $cnpj, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($cnpj) ? $cnpj : \preg_replace('/^\d/', '', $cnpj);
+		$value = \is_null($cnpj) ? $cnpj : \preg_replace('/\D/', '', $cnpj);
 		parent::__construct($value, $default, $required);
 
+		if ( $this->isMasked() ) return;
 		$this->apply(v::cnpj());
 	}
 
@@ -41,16 +42,17 @@ class CnpjType extends AbstractValueType
 	 * CNPJ will be masked as:
 	 * \d{5}*{7}\d{2}
 	 *
+	 * @param string $input Input value.
+	 * @param bool $keepLength Must keep $input length
 	 * @since 1.0.0
 	 * @return string|null
 	 */
-	public function masked () : ?string
+	protected function applyMask ( string $input, bool $keepLength = true ) : string
 	{
-		$cnpj = $this->get();
-		
-		if ( \is_null($cnpj) || \strlen($cnpj) !== 14 )
-		{ return $cnpj; }
-		
-		return \str_replace(\substr($cnpj, 5, 7), \str_repeat('*', 7), $cnpj);
+		if ( \strlen($input) !== 14 )
+		{ return $input; }
+
+		$mask = $keepLength ? \str_repeat('*', 7) : '*';
+		return \str_replace(\substr($input, 5, 7), $mask, $input);
 	}
 }

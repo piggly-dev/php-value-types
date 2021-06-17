@@ -1,8 +1,7 @@
 <?php
 namespace Piggly\ValueTypes\Advanced;
 
-use Piggly\ValueTypes\AbstractValueType;
-use Piggly\ValueTypes\Interfaces\Maskable;
+use Piggly\ValueTypes\AbstractMaskedType;
 use Respect\Validation\Validator as v;
 
 /**
@@ -18,7 +17,7 @@ use Respect\Validation\Validator as v;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class EmailType extends AbstractValueType implements Maskable
+class EmailType extends AbstractMaskedType
 {
 	/**
 	 * Constructor.
@@ -34,6 +33,7 @@ class EmailType extends AbstractValueType implements Maskable
 		$value = \is_null($email) ? $email : \strtolower($email);
 		parent::__construct($value, $default, $required);
 
+		if ( $this->isMasked() ) return;
 		$this->apply(v::email());
 	}
 
@@ -42,23 +42,33 @@ class EmailType extends AbstractValueType implements Maskable
 	 * E-mails will be masked as:
 	 * \w{3}*{1,}@\w{1}*{1,}.com[n]
 	 *
+	 * @param string $input Input value.
+	 * @param bool $keepLength Must keep $input length
 	 * @since 1.0.0
 	 * @return string|null
 	 */
-	public function masked () : ?string
+	protected function applyMask ( string $input, bool $keepLength = true ) : string
 	{
-		$email = $this->get();
+		if ( \strlen($input) <= 3 )
+		{ return $input; }
 
-		if ( \is_null($email) || \strlen($email) <= 3 )
-		{ return $email; }
+		if ( \strpos($input, '@') === false )
+		{ return \str_replace(\substr($input, 3), \str_repeat('*', \strlen($input)-3), $input); }
 
-		if ( \strpos($email, '@') === false )
-		{ return \str_replace(\substr($email, 3), \str_repeat('*', \strlen($email)-3), $email); }
+		list( $before, $after ) = \explode('@', $input);
 
-		list( $before, $after ) = \explode('@', $email);
+		if ( !$keepLength )
+		{
+			$before = \str_replace(\substr($before, 3), '*', $before);
+			$dotPos = \strpos($after, '.')-1;
+			$after = \str_replace(\substr($after, 1, $dotPos), '*', $after);
 
-		$before = \str_replace(\substr($email, 3), \str_repeat('*', \strlen($email)-3), $email);
-		$after  = \str_replace(\substr($email, 1), \str_repeat('*', \strpos($after, '.')), $email);
+			return $before.'@'.$after;
+		}
+
+		$before = \str_replace(\substr($before, 3), \str_repeat('*', \strlen($before)-3), $before);
+		$dotPos = \strpos($after, '.')-1;
+		$after  = \str_replace(\substr($after, 1, $dotPos), \str_repeat('*', $dotPos), $after);
 
 		return $before.'@'.$after;
 	}

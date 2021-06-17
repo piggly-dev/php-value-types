@@ -3,8 +3,8 @@ namespace Piggly\ValueTypes\Advanced;
 
 use Piggly\ValueTypes\AbstractValueType;
 use Piggly\ValueTypes\Exceptions\InvalidValueTypeOfException;
-use Piggly\ValueTypes\Interfaces\PasswordStrengthLib;
-use Piggly\ValueTypes\Supports\PasswordBasicLib;
+use Piggly\ValueTypes\Supports\Passwords\Interfaces\PasswordStrengthLib;
+use Piggly\ValueTypes\Supports\Passwords\PasswordBasicLib;
 
 /**
  * Represents a password.
@@ -37,7 +37,7 @@ class PasswordType extends AbstractValueType
 	 */
 	static $algo = [
 		'algo' => \PASSWORD_BCRYPT,
-		'options' => null
+		'options' => []
 	];
 
 	/**
@@ -111,6 +111,7 @@ class PasswordType extends AbstractValueType
 	 */
 	public function __construct ( ?string $password, int $minStrength = 75, $default = null, bool $required = false )
 	{ 
+		$value = $password;
 		$encrypted = !empty(\password_get_info($password)['algo']);
 
 		if ( !$encrypted )
@@ -127,9 +128,10 @@ class PasswordType extends AbstractValueType
 				if ( $strength < $minStrength )
 				{ throw new InvalidValueTypeOfException($this, 'password strength does not meet the minimum requirements'); }
 			}
-		}
 
-		$value = \password_hash($password, static::$algo['algo'], static::$algo['options']);
+			$value = \password_hash($password, static::$algo['algo'], static::$algo['options']);
+		}
+		
 		parent::__construct($value, $default, $required);
 	}
 

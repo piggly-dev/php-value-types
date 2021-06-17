@@ -34,7 +34,7 @@ class ArrayType extends AbstractValueType
 	{ 
 		$value = \is_null($value) ? $value : $this->parse($value);
 
-		if ( !\is_null($default) && !\is_array($value) )
+		if ( !\is_null($value) && !\is_array($value) )
 		{ throw new InvalidValueTypeOfException($this, 'invalid array'); }
 
 		$default = \is_null($default) ? $default : $this->parse($default);
@@ -56,6 +56,9 @@ class ArrayType extends AbstractValueType
 	{
 		if ( \is_array($value) )
 		{ return $value; }
+
+		if ( empty($value) )
+		{ return []; }
 
 		if ( \is_object($value) )
 		{

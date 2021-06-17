@@ -2,8 +2,11 @@
 namespace Piggly\ValueTypes;
 
 use Exception;
+use Piggly\ValueTypes\Common\StringType;
 use Piggly\ValueTypes\Exceptions\InvalidValueTypeOfException;
-use Respect\Validation\Validatable;
+use Piggly\ValueTypes\Interfaces\Validatable;
+use Respect\Validation\Validatable as RespectValidatable;
+use RuntimeException;
 
 /**
  * Abstract value type which controls:
@@ -54,10 +57,9 @@ abstract class AbstractValueType
 	protected $_default = null;
 
 	/**
-	 * Value is required or
-	 * not.
+	 * Value cannot be null.
 	 *
-	 * @var boolean
+	 * @var bool
 	 * @since 1.0.0
 	 */
 	protected $_required = false;
@@ -76,7 +78,7 @@ abstract class AbstractValueType
 	 * A collection of Validatable
 	 * objects to assert.
 	 *
-	 * @var array<Validatable>
+	 * @var array<Validatable|RespectValidatable>
 	 * @since 1.0.0
 	 */
 	private $_assertions = [];
@@ -107,16 +109,8 @@ abstract class AbstractValueType
 	{ return $this->_required; }
 
 	/**
-	 * Return if current value is filled.
-	 *
-	 * @since 1.0.0
-	 * @return boolean
-	 */
-	final public function isFilled () : bool
-	{ return !\is_null($this->_value); }
-
-	/**
-	 * Get raw value of ValueType.
+	 * Get raw value, ignoring the default
+	 * value.
 	 *
 	 * @since 1.0.0
 	 * @return mixed
@@ -125,41 +119,86 @@ abstract class AbstractValueType
 	{ return $this->_value; }
 
 	/**
+	 * Return if current value is not null. 
+	 * ! This method does not care if value
+	 * pass to assertions.
+	 * ! This method ignores the default
+	 * value, even it is set.
+	 *
+	 * @since 1.0.0
+	 * @return boolean
+	 */
+	final public function isRawNotNull () : bool
+	{ return !\is_null($this->_value); }
+
+	/**
+	 * Return if current value is null.
+	 * ! This method does not care if value
+	 * pass to assertions.
+	 * ! This method ignores the default
+	 * value, even it is set.
+	 *
+	 * @since 1.0.0
+	 * @return boolean
+	 */
+	final public function isRawNull () : bool
+	{ return \is_null($this->_value); }
+
+	/**
 	 * Get value of ValueType. When value
-	 * is not set or null, return the
-	 * default value.
-	 * 
-	 * Assert value before get it.
-	 * 
-	 * Call mutates() method if it exists
-	 * and value is not mutated.
+	 * is null, return the default value
+	 * if it exists.
 	 * 
 	 * @since 1.0.0
-	 * @return mixed
-	 * @throws InvalidValueTypeOfException if value is unexpected
+	 * @return mixed|null
 	 */
 	final public function get ()
-	{ 
-		$this->assert();
-		return isset($this->_value) || !\is_null($this->_value) ? $this->_value : $this->_default; 
-	}
+	{ return $this->_value ?? $this->_default; }
+
+	/**
+	 * Return if current value is not null. 
+	 * ! This method does not care if value
+	 * pass to assertions.
+	 *
+	 * @since 1.0.0
+	 * @return boolean
+	 */
+	final public function isNotNull () : bool
+	{ return !\is_null($this->_value ?? $this->_default); }
+
+	/**
+	 * Return if current value is null.
+	 * ! This method does not care if value
+	 * pass to assertions.
+	 *
+	 * @since 1.0.0
+	 * @return boolean
+	 */
+	final public function isNull () : bool
+	{ return \is_null($this->_value ?? $this->_default); }
 
 	/**
 	 * Applyies a validatable rule to this value type.
 	 *
-	 * @param Validatable $rule
+	 * @param Validatable|RespectValidatable $rule
 	 * @since 1.0.0
 	 * @return self
+	 * @throws RuntimeException If $rule does not implement interfaces.
 	 */
-	final public function apply ( Validatable $rule )
+	final public function apply ( $rule )
 	{ 
-		$this->_assertions[] = $rule; 
-		$this->_asserted = false;
-		return $this; 
+		if ( $rule instanceof Validatable || $rule instanceof RespectValidatable )
+		{
+			$this->_assertions[] = $rule; 
+			$this->_asserted = false;
+			return $this; 
+		}
+
+		throw new RuntimeException('Rule must implements Validatable or RespectValidatable interface');
 	}
 
 	/**
-	 * Validate value to ValueType.
+	 * Validate value with assertions.
 	 *
 	 * @return boolean
 	 * @since 1.0.0
@@ -175,8 +214,9 @@ abstract class AbstractValueType
 	}
 
 	/**
-	 * Caught error message while trying to
-	 * assert value to ValueType.
+	 * Validate value with assertions, but
+	 * if fail return the error message to
+	 * assertion.
 	 *
 	 * @return mixed TRUE when assert, STRING with error message.
 	 * @since 1.0.0
@@ -192,30 +232,40 @@ abstract class AbstractValueType
 	}
 
 	/**
-	 * Assert if value meets the requirements
-	 * to ValueType. It must throw an
-	 * InvalidValueTypeOfException.
+	 * Assert if value meets the requirements. 
+	 * It must throw an InvalidValueTypeOfException
+	 * if does not assert.
+	 * 
+	 * By default will always assert if value is required
+	 * and if so validate if it is set.
+	 * 
+	 * It will just run if current value is not
+	 * asserted or if was added a new assertion to this
+	 * object.
 	 *
 	 * @since 1.0.0
-	 * @return void
+	 * @return self
 	 * @throws InvalidValueTypeOfException
 	 */
 	final public function assert ()
 	{
 		if ( $this->_asserted )
-		{ return; }
+		{ return $this; }
 
-		if ( \is_null($this->get()) && $this->isRequired() )
+		$value = isset($this->_value) || !\is_null($this->_value) ? $this->_value : $this->_default;
+		
+		if ( \is_null($value) && $this->isRequired() )
 		{ throw new InvalidValueTypeOfException($this, 'is required'); }
 		
 		// Allow null so should not validate 
-		if ( \is_null($this->get()) )
-		{ return; }
+		if ( \is_null($value) )
+		{ 
+			$this->_asserted = true;
+			return $this; 
+		}
 
 		if ( !empty($this->_assertions) )
 		{
-			$value = $this->get();
-
 			foreach ( $this->_assertions as $assertions )
 			{
 				try
@@ -224,7 +274,24 @@ abstract class AbstractValueType
 				{ throw new InvalidValueTypeOfException($this, $e->getMessage()); }
 			}
 		}
-
+			
+		// Cache assertion
 		$this->_asserted = true;
+		return $this;
+	}
+
+	/**
+	 * Convert current object to string
+	 * by using (string) or strval().
+	 *
+	 * @since 1.0.0
+	 * @return string
+	 */
+	public function __toString ()
+	{ 
+		if ( $this instanceof StringType )
+		{ return $this->_value ?? $this->_default ?? 'NULL'; }
+
+		return (new StringType($this->get()))->get() ?? 'NULL'; 
 	}
 }

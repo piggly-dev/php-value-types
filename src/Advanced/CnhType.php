@@ -1,8 +1,7 @@
 <?php
 namespace Piggly\ValueTypes\Advanced;
 
-use Piggly\ValueTypes\AbstractValueType;
-use Piggly\ValueTypes\Interfaces\Maskable;
+use Piggly\ValueTypes\AbstractMaskedType;
 use Respect\Validation\Validator as v;
 
 /**
@@ -18,7 +17,7 @@ use Respect\Validation\Validator as v;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class CnhType extends AbstractValueType implements Maskable
+class CnhType extends AbstractMaskedType
 {
 	/**
 	 * Constructor.
@@ -31,9 +30,10 @@ class CnhType extends AbstractValueType implements Maskable
 	 */
 	public function __construct ( ?string $cnh, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($cnh) ? $cnh : \preg_replace('/^\d/', '', $cnh);
+		$value = \is_null($cnh) ? $cnh : \preg_replace('/\D/', '', $cnh);
 		parent::__construct($value, $default, $required);
 
+		if ( $this->isMasked() ) return;
 		$this->apply(v::cnh());
 	}
 
@@ -42,16 +42,17 @@ class CnhType extends AbstractValueType implements Maskable
 	 * CNH will be masked as:
 	 * \d{4}*{5}\d{2}
 	 *
+	 * @param string $input Input value.
+	 * @param bool $keepLength Must keep $input length
 	 * @since 1.0.0
 	 * @return string|null
 	 */
-	public function masked () : ?string
+	protected function applyMask ( string $input, bool $keepLength = true ) : string
 	{
-		$cnh = $this->get();
-		
-		if ( \is_null($cnh) || \strlen($cnh) !== 11 )
-		{ return $cnh; }
+		if ( \strlen($input) !== 11 )
+		{ return $input; }
 
-		return \str_replace(\substr($cnh, 4, 5), \str_repeat('*', 5), $cnh);
+		$mask = $keepLength ? \str_repeat('*', 6) : '*';
+		return \str_replace(\substr($input, 4, 6), $mask, $input);
 	}
 }

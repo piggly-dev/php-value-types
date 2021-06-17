@@ -27,19 +27,22 @@ class DateTimeType extends AbstractValueType
 	 * 
 	 * If $dateTime is a DateTime object it will 
 	 * convert it to a regular string according
-	 * to $format (by default Y-m-d H:i:s).
+	 * to $format (by default Y-m-d H:i:s). Same
+	 * if $dateTime is an integer as timestamp.
 	 *
-	 * @param DateTime|string|null $dateTime
+	 * @param DateTime|integer|string|null $dateTime
 	 * @param string $format Date string format.
 	 * @param mixed $default Default when $value is null.
 	 * @param mixed $required If value is required.
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function __construct ( $dateTime, string $format = null, $default = null, bool $required = false )
+	public function __construct ( $dateTime, string $format = 'Y-m-d H:i:s', $default = null, bool $required = false )
 	{ 
 		if ( $dateTime instanceof DateTime )
-		{ $date = $dateTime->format($format ?? 'Y-m-d H:i:s'); }
+		{ $dateTime = $dateTime->format($format); }
+		else if ( \intval($dateTime) )
+		{ $dateTime = (new DateTime('@'.\strval($dateTime)))->format($format); }
 
 		parent::__construct($dateTime, $default, $required);
 
