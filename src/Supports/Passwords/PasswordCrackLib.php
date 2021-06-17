@@ -1,7 +1,7 @@
 <?php
-namespace Piggly\ValueTypes\Supports;
+namespace Piggly\ValueTypes\Supports\Passwords;
 
-use Piggly\ValueTypes\Interfaces\PasswordStrengthLib;
+use Piggly\ValueTypes\Supports\Passwords\Interfaces\PasswordStrengthLib;
 
 /**
  * Uses the cracklib-check to get password strength.
@@ -24,10 +24,10 @@ use Piggly\ValueTypes\Interfaces\PasswordStrengthLib;
  * create-cracklib-dict /path/to/dict
  * 
  * @package \Piggly\ValueTypes
- * @subpackage \Piggly\ValueTypes\Supports
+ * @subpackage \Piggly\ValueTypes\Supports\Passwords
  * @version 1.0.0
  * @since 1.0.0
- * @category Values
+ * @category Passwords
  * @author Caique Araujo <caique@piggly.com.br>
  * @author Piggly Lab <dev@piggly.com.br>
  * @license MIT
@@ -80,7 +80,7 @@ class PasswordCrackLib implements PasswordStrengthLib
 	public function strength ( $raw )
 	{
 		$raw = \escapeshellarg($raw);
-		$command = "echo {$raw} | {$this->path}";
+		$command = "echo {$raw} | {$this->_path}";
 		
 		\exec($command, $out, $res);
 

@@ -1,7 +1,7 @@
 <?php
-namespace Piggly\ValueTypes\Supports;
+namespace Piggly\ValueTypes\Supports\Passwords;
 
-use Piggly\ValueTypes\Interfaces\PasswordStrengthLib;
+use Piggly\ValueTypes\Supports\Passwords\Interfaces\PasswordStrengthLib;
 use ZxcvbnPhp\Zxcvbn;
 
 /**
@@ -12,10 +12,10 @@ use ZxcvbnPhp\Zxcvbn;
  * accuracy.
  * 
  * @package \Piggly\ValueTypes
- * @subpackage \Piggly\ValueTypes\Supports
+ * @subpackage \Piggly\ValueTypes\Supports\Passwords
  * @version 1.0.0
  * @since 1.0.0
- * @category Values
+ * @category Passwords
  * @author Caique Araujo <caique@piggly.com.br>
  * @author Piggly Lab <dev@piggly.com.br>
  * @license MIT

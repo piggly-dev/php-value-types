@@ -1,8 +1,7 @@
 <?php
 namespace Piggly\ValueTypes\Advanced;
 
-use Piggly\ValueTypes\AbstractValueType;
-use Piggly\ValueTypes\Interfaces\Maskable;
+use Piggly\ValueTypes\AbstractMaskedType;
 use Respect\Validation\Validator as v;
 
 /**
@@ -18,7 +17,7 @@ use Respect\Validation\Validator as v;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class PhoneType extends AbstractValueType implements Maskable
+class PhoneType extends AbstractMaskedType
 {
 	/**
 	 * Constructor.
@@ -33,6 +32,7 @@ class PhoneType extends AbstractValueType implements Maskable
 	{ 
 		parent::__construct($phone, $default, $required);
 
+		if ( $this->isMasked() ) return;
 		$this->apply(v::phone());
 	}
 
@@ -40,18 +40,19 @@ class PhoneType extends AbstractValueType implements Maskable
 	 * Get the masked value to phone.
 	 * Mask all except the last 3 digits.
 	 *
+	 * @param string $input Input value.
+	 * @param bool $keepLength Must keep $input length
 	 * @since 1.0.0
 	 * @return string|null
 	 */
-	public function masked () : ?string
+	protected function applyMask ( string $input, bool $keepLength = true ) : string
 	{
-		$phone = $this->get();
-
-		if ( \is_null($phone) || \strlen($phone) <= 3 )
-		{ return $phone; }
+		if ( \strlen($input) <= 3 )
+		{ return $input; }
 		
-		$phone = \preg_replace('/^\d/', '', $phone);
-		$len = \strlen($phone) - 3;
-		return \str_replace(\substr($phone, 0, $len), \str_repeat('*', $len), $phone);
+		$input = \preg_replace('/\D/', '', $input);
+		$len = \strlen($input) - 3;
+		$mask = $keepLength ? \str_repeat('*', $len) : '*';
+		return \str_replace(\substr($input, 0, $len), $mask, $input);
 	}
 }

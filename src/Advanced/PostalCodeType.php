@@ -34,7 +34,7 @@ class PostalCodeType extends AbstractValueType
 	 */
 	public function __construct ( ?string $postalCode, string $countryCode = 'US', $default = null, bool $required = false )
 	{ 
-		$value = \is_null($postalCode) ? $postalCode : \preg_replace('/^\d/', '', $postalCode);
+		$value = \is_null($postalCode) ? $postalCode : \preg_replace('/\D/', '', $postalCode);
 		parent::__construct($value, $default, $required);
 
 		$this->apply(v::postalCode($countryCode));

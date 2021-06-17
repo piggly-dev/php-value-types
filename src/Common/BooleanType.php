@@ -30,9 +30,24 @@ class BooleanType extends AbstractValueType
 	 */
 	public function __construct ( $value, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($value) ? $value : \boolval($value);
-		$default = \is_null($default) ? $default : \boolval($default);
+		$value = \is_null($value) ? $value : $this->parse($value);
+		$default = \is_null($default) ? $default : $this->parse($default);
 
 		parent::__construct($value, $default, $required);
 	}
+
+	/**
+	 * Convert $value to boolean.
+	 *
+	 * @param mixed $value
+	 * @since 1.0.0
+	 * @return bool
+	 */
+	private function parse ( $value ) : bool
+	{
+		if ( $value === 'true' || $value === 'false' )
+		{ return $value === 'true' ? true : false; }
+
+		return \boolval($value);
+	} 
 }

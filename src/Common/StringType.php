@@ -45,10 +45,16 @@ class StringType extends AbstractValueType
 	 */
 	private function parse ( $value ) : string
 	{
+		if ( \is_string($value) )
+		{ return $value; }
+
+		if ( \is_bool($value) )
+		{ return $value ? 'true' : 'false'; }
+
 		if ( \is_object($value) )
 		{
 			if ( \method_exists($value, '__toString') )
-			{ return $value->__toString(); }
+			{ return \strval($value); }
 
 			return \get_class($value);
 		}

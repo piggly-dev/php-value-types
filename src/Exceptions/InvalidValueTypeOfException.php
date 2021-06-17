@@ -33,7 +33,7 @@ class InvalidValueTypeOfException extends RuntimeException
 	 */
 	public function __construct ( AbstractValueType $valueType, string $message = null )
 	{
-		$message = \is_null($message) ? 'unknown value' : $message;
+		$message = \trim(\is_null($message) ? 'unknown value' : $message, '.');
 		$value = $this->parseValue($valueType);
 
 		$this->message = \sprintf(

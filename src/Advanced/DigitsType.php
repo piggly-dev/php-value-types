@@ -16,20 +16,20 @@ use Piggly\ValueTypes\AbstractValueType;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class IpType extends AbstractValueType
+class DigitsType extends AbstractValueType
 {
 	/**
 	 * Constructor.
 	 *
-	 * @param string|null $digits
+	 * @param string|integer|null $digits
 	 * @param mixed $default Default when $value is null.
 	 * @param mixed $required If value is required.
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function __construct ( ?string $digits, $default = null, bool $required = false )
+	public function __construct ( $digits, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($digits) ? $digits : \preg_replace('/^\d/', '', $digits);
+		$value = \is_null($digits) ? $digits : \preg_replace('/\D/', '', \strval($digits));
 		parent::__construct($value, $default, $required);
 	}
 }
