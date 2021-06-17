@@ -4,6 +4,20 @@ namespace Piggly\ValueTypes\Common;
 use Piggly\ValueTypes\AbstractValueType;
 use Piggly\ValueTypes\Exceptions\InvalidValueTypeOfException;
 
+/**
+ * Represents an array type. It will always parse
+ * $value to a valid array.
+ *
+ * @package \Piggly\ValueTypes
+ * @subpackage \Piggly\ValueTypes\Common
+ * @version 1.0.0
+ * @since 1.0.0
+ * @category Values
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
+ */
 class ArrayType extends AbstractValueType
 {
 	/**
@@ -12,19 +26,18 @@ class ArrayType extends AbstractValueType
 	 * @param mixed $value
 	 * @param mixed $default Default when $value is null.
 	 * @param mixed $required If value is required.
-	 * @param 
 	 * @since 1.0.0
 	 * @return void
 	 * @throws InvalidValueTypeOfException when JSON is invalid.
 	 */
 	public function __construct ( $value, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($value) ? $value : $this->parseValue($value);
+		$value = \is_null($value) ? $value : $this->parse($value);
 
 		if ( !\is_null($default) && !\is_array($value) )
 		{ throw new InvalidValueTypeOfException($this, 'invalid array'); }
 
-		$default = \is_null($default) ? $default : $this->parseValue($default);
+		$default = \is_null($default) ? $default : $this->parse($default);
 
 		if ( !\is_null($default) && !\is_array($default) )
 		{ throw new InvalidValueTypeOfException($this, 'invalid array'); }
@@ -39,7 +52,7 @@ class ArrayType extends AbstractValueType
 	 * @since 1.0.0
 	 * @return mixed
 	 */
-	private function parseValue ( $value )
+	private function parse ( $value )
 	{
 		if ( \is_array($value) )
 		{ return $value; }

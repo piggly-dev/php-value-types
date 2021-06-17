@@ -1,14 +1,15 @@
 <?php
-namespace Piggly\ValueTypes\Common;
+namespace Piggly\ValueTypes\Advanced;
 
 use Piggly\ValueTypes\AbstractValueType;
+use Respect\Validation\Validator as v;
 
 /**
- * Represents an float type. It will always parse
- * $value to a valid float.
+ * Represents a currency code following
+ * ISO 4217 standard.
  *
  * @package \Piggly\ValueTypes
- * @subpackage \Piggly\ValueTypes\Common
+ * @subpackage \Piggly\ValueTypes\Advanced
  * @version 1.0.0
  * @since 1.0.0
  * @category Values
@@ -17,22 +18,22 @@ use Piggly\ValueTypes\AbstractValueType;
  * @license MIT
  * @copyright 2021 Piggly Lab <dev@piggly.com.br>
  */
-class FloatType extends AbstractValueType
+class CurrencyCodeType extends AbstractValueType
 {
 	/**
 	 * Constructor.
 	 *
-	 * @param mixed $value
+	 * @param string|null $currencyCode
 	 * @param mixed $default Default when $value is null.
 	 * @param mixed $required If value is required.
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function __construct ( $value, $default = null, bool $required = false )
+	public function __construct ( ?string $currencyCode, $default = null, bool $required = false )
 	{ 
-		$value = \is_null($value) ? $value : \floatval($value);
-		$default = \is_null($default) ? $default : \floatval($default);
-
+		$value = \is_null($currencyCode) ? $currencyCode : \strtoupper($currencyCode);
 		parent::__construct($value, $default, $required);
+
+		$this->apply(v::currencyCode());
 	}
 }
