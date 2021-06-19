@@ -108,6 +108,7 @@ class PasswordType extends AbstractValueType
 	 * @param mixed $required If value is required.
 	 * @since 1.0.0
 	 * @return void
+	 * @throws InvalidValueTypeOfException When does not meet the $minStrength.
 	 */
 	public function __construct ( ?string $password, int $minStrength = 75, $default = null, bool $required = false )
 	{ 
@@ -136,6 +137,21 @@ class PasswordType extends AbstractValueType
 	}
 
 	/**
+	 * Verify if $raw matches to current encrypted
+	 * password throwing an exception.
+	 *
+	 * @param string $raw
+	 * @since 1.0.0
+	 * @return void
+	 * @throws InvalidValueTypeOfException
+	 */
+	public function verify ( string $raw )
+	{ 
+		if ( !$this->check($raw) )
+		{ throw new InvalidValueTypeOfException($this, 'invalid password'); }
+	}
+
+	/**
 	 * Check if $raw matches to current encrypted
 	 * password.
 	 *
@@ -144,5 +160,10 @@ class PasswordType extends AbstractValueType
 	 * @return bool
 	 */
 	public function check ( string $raw ) : bool
-	{ return \password_verify($raw, $this->_value); }
+	{ 
+		if ( \is_null($this->_value) )
+		{ return false; }
+
+		return \password_verify($raw, $this->_value); 
+	}
 }
