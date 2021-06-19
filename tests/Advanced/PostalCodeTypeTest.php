@@ -36,7 +36,7 @@ class PostalCodeTypeTest extends TestCase
 		$faker = \Faker\Factory::create();
 
 		for ( $i = 0; $i < 50; $i++ )
-		{ $arr[] = [true, $faker->postcode()]; }
+		{ $arr[] = [true, $faker->regexify('[0-9]{5}')]; }
 
 		return $arr;
    }

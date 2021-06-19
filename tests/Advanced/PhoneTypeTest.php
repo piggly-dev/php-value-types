@@ -50,7 +50,7 @@ class PhoneTypeTest extends TestCase
 		$faker = \Faker\Factory::create();
 
 		for ( $i = 0; $i < 50; $i++ )
-		{ $arr[] = [true, $faker->phone()]; }
+		{ $arr[] = [true, $faker->phoneNumber()]; }
 
 		return $arr;
    }
