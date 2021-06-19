@@ -1,0 +1,49 @@
+{
+    "name": "piggly/php-value-types",
+    "description": "Immutable value objects to easy format and assert values.",
+    "keywords": [
+        "piggly",
+        "orm",
+        "data mapper",
+        "value objects",
+        "value types"
+    ],
+    "type": "library",
+    "homepage": "https://github.com/piggly-dev/php-value-types",
+    "autoload": {
+        "psr-4": {
+            "Piggly\\ValueTypes\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.2 || ^8.0",
+        "bjeavons/zxcvbn-php": "^1.2",
+        "respect/validation": "^2.2"
+    },
+    "require-dev": {
+        "php": "^7.3 || ^8.0",
+        "fakerphp/faker": "^1.14",
+        "phpunit/phpunit": "^9.5"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Caique Araujo",
+            "email": "caique@piggly.com.br",
+            "homepage": "https://github.com/caiquearaujo",
+            "role": "Developer"
+        },
+        {
+            "name": "Piggly Dev",
+            "email": "dev@piggly.com.br",
+            "homepage": "https://github.com/dev",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable"
+}
