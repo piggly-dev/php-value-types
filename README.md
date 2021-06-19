@@ -1,5 +1,7 @@
 # Values objects with based in data types
 
+![Versão Atual](https://img.shields.io/badge/version-1.x.x-green?style=flat-square)  [![Latest Version on Packagist](https://img.shields.io/packagist/v/piggly/php-value-types.svg?style=flat-square)](https://packagist.org/packages/piggly/php-value-types) [![Packagist Downloads](https://img.shields.io/packagist/dt/piggly/php-value-types?style=flat-square)](https://packagist.org/packages/piggly/php-value-types) [![Packagist Stars](https://img.shields.io/packagist/stars/piggly/php-value-types?style=flat-square)](https://packagist.org/packages/piggly/php-value-types) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE) ![PHP](https://img.shields.io/packagist/php-v/piggly/php-value-types?style=flat-square)
+
 This library was developed mainly to API systems. But, it may be applied to any systems.
 
 ## What is Value Object?
