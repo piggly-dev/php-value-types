@@ -281,6 +281,23 @@ abstract class AbstractValueType
 	}
 
 	/**
+	 * Mutate current value returning a new object.
+	 *
+	 * @param mixed $value
+	 * @since 1.1.0
+	 * @return AbstractValueType
+	 */
+	final public function mutate ( $value ) : AbstractValueType
+	{
+		$new = new self($value, $this->_default, $this->_required);
+
+		$new->_asserted = $this->_asserted;
+		$new->_assertions = $this->_assertions;
+
+		return $new;
+	}
+
+	/**
 	 * Convert current object to string
 	 * by using (string) or strval().
 	 *
