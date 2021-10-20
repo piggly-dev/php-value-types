@@ -1,6 +1,20 @@
 <?php
 namespace Piggly\ValueTypes;
 
+/**
+ * Abstract mask type indicates the value
+ * is masked by some function.
+ *
+ * @package \Piggly\ValueTypes
+ * @subpackage \Piggly\ValueTypes
+ * @version 1.0.0
+ * @since 1.0.0
+ * @category Values
+ * @author Caique Araujo <caique@piggly.com.br>
+ * @author Piggly Lab <dev@piggly.com.br>
+ * @license MIT
+ * @copyright 2021 Piggly Lab <dev@piggly.com.br>
+ */
 abstract class AbstractMaskedType extends AbstractValueType
 {
 	/**
