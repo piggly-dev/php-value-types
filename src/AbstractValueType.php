@@ -289,7 +289,7 @@ abstract class AbstractValueType
 	 */
 	final public function mutate ( $value ) : AbstractValueType
 	{
-		$new = new self($value, $this->_default, $this->_required);
+		$new = new static($value, $this->_default, $this->_required);
 
 		$new->_asserted = $this->_asserted;
 		$new->_assertions = $this->_assertions;
